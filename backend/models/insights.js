@@ -1,32 +1,9 @@
 const mongoose = require('mongoose');
 
-/**
- * Insight Model
- * 
- * Using strict: false to allow dynamic/flexible fields from the JSON data.
- * This is intentional because:
- * - The dataset has many empty string values
- * - Fields vary between records
- * - MongoDB handles schemaless data well
- * 
- * Known fields in the dataset:
- * - end_year, start_year (can be empty string or number)
- * - intensity, likelihood, relevance, impact (numeric metrics)
- * - sector, topic, pestle, source (categorical)
- * - region, country, city (geographic)
- * - title, insight, url (content)
- * - added, published (date strings)
- */
-const insightSchema = new mongoose.Schema(
-    {},
-    {
-        strict: false,
-        timestamps: true,
-        collection: 'insights'
-    }
-);
+// Flexible schema to accommodate varying JSON data structure (strict: false allows dynamic fields)
+const insightSchema = new mongoose.Schema({}, { strict: false, timestamps: true, collection: 'insights' });
 
-// Add index for common query fields (improves filter performance)
+// Indexes for optimizing frequently queried fields
 insightSchema.index({ sector: 1 });
 insightSchema.index({ topic: 1 });
 insightSchema.index({ region: 1 });
