@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import LoginPage from './components/LoginPage';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import InsightsTable from './components/InsightsTable';
@@ -12,6 +13,8 @@ import './index.css';
 const API_BASE = 'http://localhost:5000';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [filters, setFilters] = useState({});
   const [dashboardData, setDashboardData] = useState(null);
@@ -20,19 +23,49 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check for stored auth on mount
   useEffect(() => {
-    loadInitialData();
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+    if (token && storedUser) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
+
+  // Load data when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadInitialData();
+    }
+  }, [isAuthenticated]);
+
+  const handleLogin = (userData, token) => {
+    setUser(userData);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setIsAuthenticated(false);
+    setUser(null);
+    setDashboardData(null);
+    setStatsData(null);
+  };
 
   const loadInitialData = async () => {
     try {
       setLoading(true);
       setError(null);
 
+      const token = localStorage.getItem('token');
+      const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+
       const [summaryRes, statsRes, optionsRes] = await Promise.all([
-        fetch(`${API_BASE}/api/analytics/dashboard/summary`),
-        fetch(`${API_BASE}/api/insights/stats`),
-        fetch(`${API_BASE}/api/insights/filters/options`)
+        fetch(`${API_BASE}/api/analytics/dashboard/summary`, { headers }),
+        fetch(`${API_BASE}/api/insights/stats`, { headers }),
+        fetch(`${API_BASE}/api/insights/filters/options`, { headers })
       ]);
 
       const [summaryJson, statsJson, optionsJson] = await Promise.all([
@@ -41,17 +74,13 @@ function App() {
         optionsRes.json()
       ]);
 
-      console.log('Dashboard Summary:', summaryJson);
-      console.log('Stats Data:', statsJson);
-      console.log('Filter Options:', optionsJson);
-
       if (summaryJson.success) setDashboardData(summaryJson.data);
       if (statsJson.success) setStatsData(statsJson.data);
       if (optionsJson.success) setFilterOptions(optionsJson.data);
 
     } catch (err) {
       console.error('Error loading data:', err);
-      setError('Failed to connect to backend. Make sure backend is running on port 5000.');
+      setError('Failed to connect to backend.');
     } finally {
       setLoading(false);
     }
@@ -77,7 +106,6 @@ function App() {
 
       if (json.success && json.data) {
         const aggregated = aggregateData(json.data);
-        console.log('Aggregated filtered data:', aggregated);
         setStatsData(aggregated);
       }
     } catch (err) {
@@ -106,15 +134,9 @@ function App() {
         topicMap[item.topic].sum += item.relevance || 0;
         topicMap[item.topic].count++;
       }
-      if (item.country) {
-        countryMap[item.country] = (countryMap[item.country] || 0) + 1;
-      }
-      if (item.end_year && typeof item.end_year === 'number') {
-        yearMap[item.end_year] = (yearMap[item.end_year] || 0) + 1;
-      }
-      if (item.pestle) {
-        pestleMap[item.pestle] = (pestleMap[item.pestle] || 0) + 1;
-      }
+      if (item.country) countryMap[item.country] = (countryMap[item.country] || 0) + 1;
+      if (item.end_year && typeof item.end_year === 'number') yearMap[item.end_year] = (yearMap[item.end_year] || 0) + 1;
+      if (item.pestle) pestleMap[item.pestle] = (pestleMap[item.pestle] || 0) + 1;
     });
 
     return {
@@ -133,9 +155,10 @@ function App() {
     loadInitialData();
   };
 
-  const handleNavigation = (page) => {
-    setCurrentPage(page);
-  };
+  // Show login page if not authenticated
+  if (!isAuthenticated) {
+    return <LoginPage onLogin={handleLogin} />;
+  }
 
   const renderContent = () => {
     if (error) {
@@ -151,29 +174,20 @@ function App() {
     }
 
     switch (currentPage) {
-      case 'insights':
-        return <InsightsTable filters={filters} />;
-      case 'geographic':
-        return <GeographicPage />;
-      case 'pestle':
-        return <PestlePage />;
-      case 'trends':
-        return <TrendsPage />;
-      case 'analytics':
-        return <AnalyticsPage />;
-      case 'export':
-        return <ExportPage />;
-      case 'filters':
-        return <Dashboard data={dashboardData} statsData={statsData} loading={loading} filters={filters} filterOptions={filterOptions} onFilterChange={handleFilterChange} onRefresh={handleRefresh} showFiltersExpanded={true} />;
-      case 'dashboard':
-      default:
-        return <Dashboard data={dashboardData} statsData={statsData} loading={loading} filters={filters} filterOptions={filterOptions} onFilterChange={handleFilterChange} onRefresh={handleRefresh} />;
+      case 'insights': return <InsightsTable filters={filters} />;
+      case 'geographic': return <GeographicPage />;
+      case 'pestle': return <PestlePage />;
+      case 'trends': return <TrendsPage />;
+      case 'analytics': return <AnalyticsPage />;
+      case 'export': return <ExportPage />;
+      case 'filters': return <Dashboard data={dashboardData} statsData={statsData} loading={loading} filters={filters} filterOptions={filterOptions} onFilterChange={handleFilterChange} onRefresh={handleRefresh} showFiltersExpanded={true} />;
+      default: return <Dashboard data={dashboardData} statsData={statsData} loading={loading} filters={filters} filterOptions={filterOptions} onFilterChange={handleFilterChange} onRefresh={handleRefresh} />;
     }
   };
 
   return (
     <div className="app-layout">
-      <Sidebar currentPage={currentPage} onNavigate={handleNavigation} />
+      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} user={user} onLogout={handleLogout} />
       <main className="main-content">
         {renderContent()}
       </main>

@@ -7,6 +7,7 @@ const healthRoutes = require('./routes/health');
 const insightRoutes = require('./routes/insights');
 const analyticsRoutes = require('./routes/analytics');
 const exportRoutes = require('./routes/export');
+const authRoutes = require('./routes/auth');
 
 const { sanitizeInputs, requestLogger } = require('./middleware/validation');
 const { standardLimiter, exportLimiter } = require('./middleware/rateLimiter');
@@ -31,6 +32,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 // Route mounting
 app.use('/health', healthRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/api/insights', insightRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/export', exportLimiter, exportRoutes);
