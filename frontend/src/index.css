@@ -532,43 +532,72 @@ body {
   align-items: center;
   justify-content: center;
   position: relative;
+  min-height: 600px;
+  /* Increased height for bigger illustration */
+}
+
+/* Background Circle */
+.bg-circle {
+  position: absolute;
+  width: 500px;
+  /* Increased size */
+  height: 500px;
+  /* Increased size */
+  border-radius: 50%;
+  background: #f0f0f5;
+  /* Slightly darker than bg for visibility */
+  z-index: 1;
+}
+
+/* Character Image */
+.character-image {
+  position: relative;
+  z-index: 2;
+  height: 550px;
+  /* Increased from 420px */
+  max-width: 100%;
+  object-fit: contain;
 }
 
 /* Floating Cards */
 .illustration-card {
   position: absolute;
   background: white;
-  border-radius: 12px;
-  padding: 16px 20px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 20px 24px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  /* Softer shadow */
+  z-index: 3;
+}
+
+.illustration-card.card-profit {
+  top: 60px;
+  left: 20px;
   min-width: 160px;
 }
 
-.illustration-card.card-analytics {
-  top: 60px;
-  left: 80px;
-}
-
-.illustration-card.card-insights {
-  bottom: 80px;
-  right: 60px;
+.illustration-card.card-order {
+  bottom: 150px;
+  /* Adjusted position */
+  right: 20px;
+  min-width: 170px;
 }
 
 .card-label {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .card-sublabel {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--text-muted);
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .line-chart {
-  height: 35px;
-  margin-bottom: 8px;
+  height: 50px;
+  margin-bottom: 12px;
 }
 
 .chart-svg {
@@ -576,25 +605,43 @@ body {
   height: 100%;
 }
 
-.bar-chart {
-  margin-bottom: 8px;
+/* Horizontal Bars for Order Card */
+.horizontal-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+  /* Changed to properly verify bars */
 }
 
-.bar-group {
+.h-bar {
+  height: 8px;
+  background: #f0f0f5;
+  border-radius: 10px;
+}
+
+.h-bar.accent {
+  background: var(--primary);
+}
+
+/* Specific bar adjustments to look like bar chart */
+.bar-chart-vertical {
   display: flex;
   align-items: flex-end;
-  gap: 6px;
-  height: 45px;
+  gap: 10px;
+  height: 50px;
+  margin-bottom: 12px;
+  justify-content: space-between;
 }
 
-.mini-bar {
-  flex: 1;
-  background: #e8e8e8;
-  border-radius: 3px;
-  min-width: 12px;
+.v-bar {
+  width: 8px;
+  background: #e0e0ff;
+  border-radius: 10px;
 }
 
-.mini-bar.accent {
+.v-bar.accent {
   background: var(--primary);
 }
 
@@ -605,50 +652,18 @@ body {
 }
 
 .metric-value {
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .metric-change {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .metric-change.positive {
   color: var(--success);
-}
-
-/* Center Icon */
-.illustration-center {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10;
-}
-
-.center-circle {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary) 0%, #9e95f5 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 30px rgba(115, 103, 240, 0.35);
-}
-
-.bar-icon {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-  height: 30px;
-}
-
-.bar-icon .bar {
-  width: 8px;
-  border-radius: 2px;
 }
 
 /* Right Side - Login Form */

@@ -84,12 +84,12 @@ const LoginPage = ({ onLogin }) => {
                     <div className="illustration-card card-order">
                         <div className="card-label">Order</div>
                         <div className="card-sublabel">Last week</div>
-                        <div className="horizontal-bars">
-                            <div className="h-bar" style={{ width: '70%' }}></div>
-                            <div className="h-bar short" style={{ width: '30%' }}></div>
-                            <div className="h-bar" style={{ width: '60%' }}></div>
-                            <div className="h-bar" style={{ width: '85%' }}></div>
-                            <div className="h-bar accent" style={{ width: '75%' }}></div>
+                        <div className="bar-chart-vertical">
+                            <div className="v-bar accent" style={{ height: '60%' }}></div>
+                            <div className="v-bar accent" style={{ height: '40%' }}></div>
+                            <div className="v-bar accent" style={{ height: '30%' }}></div>
+                            <div className="v-bar accent" style={{ height: '50%' }}></div>
+                            <div className="v-bar accent" style={{ height: '90%' }}></div>
                         </div>
                         <div className="card-metric">
                             <span className="metric-value">124k</span>
@@ -105,11 +105,6 @@ const LoginPage = ({ onLogin }) => {
                     <div className="login-header">
                         <h1>Welcome to Blackcoffer! 👋</h1>
                         <p>Please sign-in to your account and start the adventure</p>
-                    </div>
-
-                    <div className="demo-credentials">
-                        <p><span className="label">Admin Email:</span> admin@demo.com / Pass: <span className="label">admin123</span></p>
-                        <p><span className="label">Client Email:</span> client@demo.com / Pass: <span className="label">client</span></p>
                     </div>
 
                     {error && <div className="error-message">{error}</div>}
