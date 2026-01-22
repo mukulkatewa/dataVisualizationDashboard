@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 
 const healthRoutes = require('./routes/health');
@@ -16,7 +17,7 @@ const app = express();
 
 // CORS configuration - restrict origin in production
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : '*',
+    origin: '*', // Allow all origins for simplicity in this deployment
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -25,6 +26,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(standardLimiter);
 app.use(sanitizeInputs);
+
+// Ensure DB connection for Serverless environment
+app.use(async (req, res, next) => {
+    if (mongoose.connection.readyState === 0) {
+        try {
+            await connectDB();
+        } catch (error) {
+            console.error('DB Connection Error:', error);
+        }
+    }
+    next();
+});
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(requestLogger);
