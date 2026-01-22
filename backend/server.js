@@ -121,6 +121,8 @@ process.on('unhandledRejection', (err) => { console.error('Unhandled Promise Rej
 process.on('uncaughtException', (err) => { console.error('Uncaught Exception:', err); process.exit(1); });
 process.on('SIGTERM', async () => { console.log('SIGTERM received. Shutting down gracefully...'); process.exit(0); });
 
-startServer();
+if (require.main === module) {
+    startServer();
+}
 
 module.exports = app;
