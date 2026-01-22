@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { BarChart3 } from 'lucide-react';
 import { Bar, Scatter } from 'react-chartjs-2';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const AnalyticsPage = () => {
     const [data, setData] = useState(null);

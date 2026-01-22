@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { Line, Bar } from 'react-chartjs-2';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const TrendsPage = () => {
     const [data, setData] = useState(null);

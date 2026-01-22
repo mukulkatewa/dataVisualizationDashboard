@@ -16,35 +16,50 @@ const { standardLimiter, exportLimiter } = require('./middleware/rateLimiter');
 const app = express();
 
 // CORS configuration - restrict origin in production
+// CORS configuration
 app.use(cors({
-    origin: '*', // Allow all origins for simplicity in this deployment
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Enable pre-flight across-the-board
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(standardLimiter);
 app.use(sanitizeInputs);
 
-// Ensure DB connection for Serverless environment
+// Health check - accessible without DB connection
+app.use('/api/health', healthRoutes);
+
+// Ensure DB connection for Serverless environment (for other routes)
 app.use(async (req, res, next) => {
     if (mongoose.connection.readyState === 0) {
         try {
             await connectDB();
         } catch (error) {
             console.error('DB Connection Error:', error);
+            return res.status(503).json({
+                success: false,
+                message: 'Service Unavailable: Database connection failed. Please ensure MongoDB Atlas IP Whitelist allows access (0.0.0.0/0).',
+                error: error.message
+            });
         }
     }
     next();
 });
+
+// app.use((req, res, next) => { ... }) // logging - removing conditional for brevity/stability or keeping it? 
+// existing logging was conditional. I'll keep it simple.
 
 if (process.env.NODE_ENV !== 'production') {
     app.use(requestLogger);
 }
 
 // Route mounting
-app.use('/health', healthRoutes);
+// app.use('/health', healthRoutes); // Removed duplicate
 app.use('/api/auth', authRoutes);
 app.use('/api/insights', insightRoutes);
 app.use('/api/analytics', analyticsRoutes);

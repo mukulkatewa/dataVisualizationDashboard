@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Globe } from 'lucide-react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 
-const API_BASE = 'http://localhost:5000';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const GeographicPage = () => {
     const [data, setData] = useState(null);
